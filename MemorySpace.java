@@ -57,33 +57,32 @@ public class MemorySpace {
 	 *        the length (in words) of the memory block that has to be allocated
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
-	public int malloc(int length) {		
-		//// Replace the following statement with your code
+
+	public int malloc(int length) {
 		if (length <= 0) {
 			throw new IllegalArgumentException("Length must be positive");
 		}
+	
 		ListIterator freeBlock = freeList.iterator();
-
+	
 		while (freeBlock.hasNext()) {
-			MemoryBlock current = freeBlock.next();
-			if (current.length == length) {
-				allocatedList.addLast(current);
-				freeList.remove(current);  
-				return current.baseAddress; 
-			} 
-			else if (current.length > length) {
-				MemoryBlock block = new MemoryBlock(current.baseAddress, length);  
-				allocatedList.addLast(block); 
+			MemoryBlock currbBlock = freeBlock.next();
 	
-				current.baseAddress += length;
-				current.length -= length;
-	
-				return block.baseAddress;  
+			if (currbBlock.length == length) {
+				allocatedList.addLast(currbBlock);
+				freeList.remove(currbBlock);
+				return currbBlock.baseAddress;
+			} else if (currbBlock.length > length) {
+				MemoryBlock block = new MemoryBlock(currbBlock.baseAddress, length);
+				allocatedList.addLast(block);
+				currbBlock.baseAddress += length;
+				currbBlock.length -= length;
+				return block.baseAddress;
 			}
 		}
-			return -1;
+	
+		return -1;
 	}
-		
 
 	/**
 	 * Frees the memory block whose base address equals the given address.
@@ -94,34 +93,34 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
 		if(allocatedList.getSize() == 0){
-			throw new IllegalArgumentException("No allocated blocks to free.");
+		throw new IllegalArgumentException(
+				"index must be between 0 and size");
 		}
-			ListIterator iterator = allocatedList.iterator();
-			MemoryBlock blockToFree = null;
-		
-			while (iterator.hasNext()) {
-				MemoryBlock block = iterator.next();
-				if (block.baseAddress == address) {
-					blockToFree = block;
-					break;
-				}
-			}
-				if (blockToFree != null) {
-				freeList.addLast(blockToFree);  
-				allocatedList.remove(blockToFree);
+		ListIterator iterator = allocatedList.iterator();
+		MemoryBlock blockToFree = null;
+
+		while (iterator.hasNext()){
+			MemoryBlock block = iterator.next();
+			if (block.baseAddress == address){
+				blockToFree = block;
+				 break;
 			}
 		}
-		
+
+		if (blockToFree != null){
+			freeList.addLast(blockToFree);
+			allocatedList.remove(blockToFree);
+		}
+	}
+	
 	/**
 	 * A textual representation of the free list and the allocated list of this memory space, 
 	 * for debugging purposes.
 	 */
 	public String toString() {
-	return freeList.toString() + "\n" + allocatedList.toString();		
-}
-	
+		return freeList.toString() + "\n" + allocatedList.toString();		
+	}
 	
 	/**
 	 * Performs defragmantation of this memory space.
@@ -135,18 +134,17 @@ public class MemorySpace {
 		}
 	
 		ListIterator freeBlock = freeList.iterator();
-		MemoryBlock previousBlock = null;
+		MemoryBlock prevBlock = null;
 	
 		while (freeBlock.hasNext()) {
-			MemoryBlock currentBlock = freeBlock.next();
+			MemoryBlock currBlock = freeBlock.next();
 	
-			if (previousBlock != null && previousBlock.baseAddress + previousBlock.length == currentBlock.baseAddress) {
-				previousBlock.length += currentBlock.length;
+			if (prevBlock != null && prevBlock.baseAddress + prevBlock.length == currBlock.baseAddress) {
+				prevBlock.length += currBlock.length;
 			
 			} else {
-				previousBlock = currentBlock;
+				prevBlock = currBlock;
 			}
 		}
 	}
-	
 }
