@@ -141,6 +141,7 @@ public class MemorySpace {
 	
 			if (prevBlock != null && prevBlock.baseAddress + prevBlock.length == currBlock.baseAddress) {
 				prevBlock.length += currBlock.length;
+				freeList.remove(currBlock); 
 			
 			} else {
 				prevBlock = currBlock;
@@ -148,3 +149,4 @@ public class MemorySpace {
 		}
 	}
 }
+
