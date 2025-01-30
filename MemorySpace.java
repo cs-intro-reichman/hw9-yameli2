@@ -129,24 +129,22 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		//// Write your code here
-		if (freeList.getSize() <= 1) {
-			return;
-		}
-	
-		ListIterator freeBlock = freeList.iterator();
-		MemoryBlock prevBlock = null;
-	
-		while (freeBlock.hasNext()) {
-			MemoryBlock currBlock = freeBlock.next();
-	
-			if (prevBlock != null && prevBlock.baseAddress + prevBlock.length == currBlock.baseAddress) {
-				prevBlock.length += currBlock.length;
-				freeList.remove(currBlock); 
-			
-			} else {
-				prevBlock = currBlock;
+			if (freeList.getSize() <= 1) {
+				return; 
 			}
-		}
+		
+			ListIterator freeBlock = freeList.iterator();
+			while ( freeBlock.hasNext()) {
+				MemoryBlock currBlock =  freeBlock.next();
+				ListIterator innerIterator = freeList.iterator();
+				while (innerIterator.hasNext()) {
+					MemoryBlock nextBlock = innerIterator.next();
+					if (nextBlock != currBlock && currBlock.baseAddress + currBlock.length == nextBlock.baseAddress) {
+						currBlock.length += nextBlock.length;
+						freeList.remove(nextBlock);
+						innerIterator = freeList.iterator();
+					}
+				}
+			}
+		}	
 	}
-}
-
